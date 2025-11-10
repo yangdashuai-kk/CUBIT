@@ -100,7 +100,7 @@ bool Cubit::init_sequential_test()
         // append()
         merge_threshold = 4;
         int l_nor = g_number_of_rows;
-        append(0, to_val);
+        append(0, to_val,UINT64_MAX);
         cnt2 = evaluate(0, to_val);    // does not perform merge
         std::this_thread::sleep_for(1s);
         assert(READ_ONCE(g_timestamp) == 5);
@@ -227,7 +227,7 @@ bool Cubit::init_sequential_test()
         // append()
         merge_threshold = 4;
         int l_nor = g_number_of_rows;
-        append(0, to_val);
+        append(0, to_val,UINT64_MAX);
         cnt2 = evaluate(0, to_val);    // does not perform merge
         std::this_thread::sleep_for(1s);
         assert(READ_ONCE(g_timestamp) == 4);

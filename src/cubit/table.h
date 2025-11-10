@@ -15,8 +15,8 @@
 
 // using namespace std;
 
-extern uint64_t db_timestamp __attribute__((aligned(128)));
-extern uint64_t db_number_of_rows;
+extern uint64_t db_timestamp __attribute__((aligned(128)));//数据库全局时间戳
+extern uint64_t db_number_of_rows;//数据库总行数
 
 typedef std::map<uint16_t, uint16_t> RLE_map;    // Run-Length Encoding
 
@@ -141,7 +141,11 @@ public:
 
     Cubit(Table_config *);
 
+
+    int append(int, int);
     int append(int, int, uint64_t row_id = UINT64_MAX);
+
+
     int remove(int, uint64_t);
     int update(int, uint64_t, int);
     int evaluate(int, uint32_t);
