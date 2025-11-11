@@ -15,8 +15,8 @@
 
 // using namespace std;
 
-extern uint64_t db_timestamp __attribute__((aligned(128)));//数据库全局时间戳
-extern uint64_t db_number_of_rows;//数据库总行数
+extern uint64_t db_timestamp __attribute__((aligned(128)));
+extern uint64_t db_number_of_rows;
 
 typedef std::map<uint16_t, uint16_t> RLE_map;    // Run-Length Encoding
 

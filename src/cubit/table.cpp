@@ -1206,9 +1206,6 @@ int Cubit::range(int tid, uint32_t start, uint32_t range) {
         // seg_btv_ret->adjustSize(0, g_number_of_rows);
         seg_btv_ret->decompress();
     }
-
-    bool first = true;
-
     for (uint32_t idx = start; idx < (start + range); idx++) {
         Bitmap *bitmap = __atomic_load_n(&bitmaps[idx], MM_ACQUIRE);
         uint64_t tsp_begin = READ_ONCE(bitmap->l_commit_ts);
@@ -1236,21 +1233,14 @@ int Cubit::range(int tid, uint32_t start, uint32_t range) {
             *seg_btv_ret ^= *old_seg_btv;
         }
         else {
-            #ifdef CUBIT_FORCE_AND_C2                                  
-            if (first) {                                 
-                btv_ret->copy(*old_btv);                  
-                first = false;                          
-            } else {                                         
-                btv_ret->force_and_c2(*old_btv);            
-            }                                              
-            #else                                                 
-            if (first) {                                 
-                btv_ret->copy(*old_btv);               
-                first = false;                           
-            } else {                                     
-                (*btv_ret) &= (*old_btv);                
-            }                                        
-            #endif
+            if(btv_ret->size() > old_btv->size()) {
+                ibis::bitvector btv_copy;
+                btv_copy.copy(*old_btv);
+                (*btv_ret).operator^= (btv_copy);
+            }
+            else {
+                (*btv_ret).operator^= (*old_btv);
+            }
         }
 
         auto t3 = std::chrono::high_resolution_clock::now();
@@ -1306,7 +1296,7 @@ int Cubit::range(int tid, uint32_t start, uint32_t range) {
             struct merge_req *req = new merge_req{tid, idx, trans, bitmap, bitmap_new, rubs_t};
 
             {
-                lock_guard<mutex> locec004320k(lk_merge_req_queues[tid]);
+                lock_guard<mutex> lock(lk_merge_req_queues[tid]);
                 merge_req_queues[tid].push(req);
             }
         }
